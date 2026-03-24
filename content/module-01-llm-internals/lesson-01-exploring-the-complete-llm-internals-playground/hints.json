@@ -1,0 +1,5 @@
+{
+  "hint_1": "Think about this as two main steps: finding word boundaries in the text, then mapping each word to its vocabulary ID while tracking positions.",
+  "hint_2": "Use regex pattern '\\b\\w+\\b' to find word boundaries. The re.finditer() method returns match objects with start() and end() methods for positions.",
+  "hint_3": "Structure: 1) Check for empty text, 2) Find all matches with _find_token_matches(), 3) For each match: normalize with _normalize_token(), lookup in vocab with .get(normalized, vocab['<UNK>']), append dict with token/id/start/end"
+}

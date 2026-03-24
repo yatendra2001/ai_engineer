@@ -1,0 +1,27 @@
+{
+  "id": "m01-l01",
+  "module_slug": "module-01-llm-internals",
+  "lesson_number": 1,
+  "lesson_slug": "lesson-01-exploring-the-complete-llm-internals-playground",
+  "title": "Exploring the Complete LLM Internals Playground",
+  "concept": "End-to-end LLM processing pipeline visualization",
+  "primary_question": "What exactly am I going to build and why should I care?",
+  "what_gets_built": "A complete demo of the finished app runs locally, showing all panels working together with sample text.",
+  "xp_reward": 120,
+  "estimated_minutes": 30,
+  "lesson_type": "CONCEPT_HEAVY",
+  "module_type": "EVERGREEN",
+  "last_researched": "2026-03-24",
+  "prereqs": [],
+  "concepts_introduced": [
+    "End-to-end LLM processing pipeline visualization"
+  ],
+  "challenge": {
+    "function_name": "tokenize_text_with_positions",
+    "difficulty": "GUIDED",
+    "time_estimate_minutes": 12,
+    "runs_in_browser": true
+  },
+  "status": "draft",
+  "generated_at": "2026-03-24T23:25:59.161396"
+}

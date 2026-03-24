@@ -1,0 +1,97 @@
+{
+  "sources": [
+    {
+      "rank": 1,
+      "url": "https://huggingface.co/docs/transformers/model_doc/llama2",
+      "title": "HuggingFace Transformers LLaMA Documentation",
+      "type": "OFFICIAL_DOCS",
+      "relevance_score": 9,
+      "what_it_covers": "Complete transformer architecture implementation with tokenization, attention mechanisms, and inference pipeline components.",
+      "freshness": "2024-03",
+      "key_sections": [
+        "Model Architecture",
+        "Tokenization",
+        "Generation Parameters",
+        "Pipeline Usage"
+      ]
+    },
+    {
+      "rank": 2,
+      "url": "https://jalammar.github.io/illustrated-transformer/",
+      "title": "The Illustrated Transformer",
+      "type": "DEEP_DIVE",
+      "relevance_score": 10,
+      "what_it_covers": "Visual breakdown of transformer architecture from input tokenization through attention layers to output generation.",
+      "freshness": "undated",
+      "key_sections": [
+        "Self-Attention Visualization",
+        "Encoder-Decoder Stack",
+        "Positional Encoding",
+        "Multi-Head Attention"
+      ]
+    },
+    {
+      "rank": 3,
+      "url": "https://blog.langchain.dev/llms-and-sql/",
+      "title": "LangChain: Understanding LLM Processing Chains",
+      "type": "ENGINEERING_BLOG",
+      "relevance_score": 8,
+      "what_it_covers": "Production implementation of LLM processing pipelines with real-world examples of tokenization, embedding, and response generation.",
+      "freshness": "2024-01",
+      "key_sections": [
+        "Pipeline Architecture",
+        "Token Processing",
+        "Memory Management",
+        "Output Formatting"
+      ]
+    },
+    {
+      "rank": 4,
+      "url": "https://lilianweng.github.io/posts/2023-01-27-the-transformer-family/",
+      "title": "The Transformer Family",
+      "type": "DEEP_DIVE",
+      "relevance_score": 9,
+      "what_it_covers": "Comprehensive analysis of transformer variants and their internal processing mechanisms from attention to generation.",
+      "freshness": "2023-01",
+      "key_sections": [
+        "Attention Mechanisms",
+        "Position Embeddings",
+        "Layer Normalization",
+        "Generation Strategies"
+      ]
+    },
+    {
+      "rank": 5,
+      "url": "https://platform.openai.com/docs/guides/text-generation",
+      "title": "OpenAI Text Generation Guide",
+      "type": "OFFICIAL_DOCS",
+      "relevance_score": 7,
+      "what_it_covers": "End-to-end text generation pipeline including tokenization, model processing, and response formatting for production use.",
+      "freshness": "2024-02",
+      "key_sections": [
+        "Tokenization Process",
+        "Model Parameters",
+        "Response Streaming",
+        "Error Handling"
+      ]
+    }
+  ],
+  "known_misconceptions": [
+    "LLMs process text word-by-word sequentially — they actually process tokens in parallel through attention mechanisms",
+    "The model 'understands' text like humans — it's performing statistical pattern matching on token sequences",
+    "Bigger context windows mean better performance — they increase computational cost and may dilute attention"
+  ],
+  "related_concepts": [
+    "Neural network visualization tools",
+    "Token embedding spaces",
+    "Attention weight heatmaps",
+    "Model interpretability techniques"
+  ],
+  "search_terms_used": [
+    "LLM internals visualization",
+    "transformer architecture playground",
+    "attention mechanism demo",
+    "tokenization pipeline",
+    "LLM processing stages"
+  ]
+}

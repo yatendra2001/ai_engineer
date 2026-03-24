@@ -1,0 +1,167 @@
+{
+  "module_slug": "module-01-llm-internals",
+  "module_title": "How LLMs Actually Work",
+  "module_type": "EVERGREEN",
+  "capstone_description": "An interactive web app called the LLM Internals Playground. Panels include: live tokenizer, sampling distribution with temperature/top-p sliders, attention heatmap, embedding visualizer, hallucination risk indicator, model comparator. Built panel-by-panel across 10 lessons. Each lesson adds one working panel to the running app.",
+  "generated_at": "2026-03-24T20:35:00.391814",
+  "lessons": [
+    {
+      "lesson_number": 1,
+      "title": "Exploring the Complete LLM Internals Playground",
+      "concept": "End-to-end LLM processing pipeline visualization",
+      "what_gets_built": "A complete demo of the finished app runs locally, showing all panels working together with sample text.",
+      "codebase_state_before": "Empty repository",
+      "codebase_state_after": "Complete working demo app with all panels functional but code intentionally obfuscated/minified",
+      "why_here": "Developers need to see the complete vision before committing time. This creates motivation and provides a concrete reference for what each subsequent lesson builds toward.",
+      "depends_on": [],
+      "primary_question": "What exactly am I going to build and why should I care?",
+      "lesson_type": "CONCEPT_HEAVY",
+      "estimated_minutes": 30,
+      "xp_reward": 120
+    },
+    {
+      "lesson_number": 2,
+      "title": "Building a Live Tokenizer with Byte-Pair Encoding",
+      "concept": "Tokenization as text-to-numbers conversion",
+      "what_gets_built": "Users can type text and see it split into tokens in real-time with token IDs displayed.",
+      "codebase_state_before": "Basic HTML/CSS structure with empty panel containers",
+      "codebase_state_after": "Working tokenizer panel with input field, token display, and BPE implementation using tiktoken library",
+      "why_here": "Tokenization is the first step in any LLM pipeline and must be understood before any other processing. It's concrete and immediately visual.",
+      "depends_on": [
+        1
+      ],
+      "primary_question": "How does an LLM convert my text into numbers it can actually work with?",
+      "lesson_type": "CODE_HEAVY",
+      "estimated_minutes": 45,
+      "xp_reward": 140
+    },
+    {
+      "lesson_number": 3,
+      "title": "Creating Word Embeddings with Vector Visualization",
+      "concept": "Token embeddings as high-dimensional meaning representations",
+      "what_gets_built": "Tokens from the tokenizer now display as 3D plotted vectors showing semantic similarity between words.",
+      "codebase_state_after": "Embedding panel with Three.js visualization, vector similarity calculations, and connection to tokenizer output",
+      "codebase_state_before": "Tokenizer panel working, empty embedding panel container",
+      "why_here": "Once we have tokens, we need to understand how they become meaningful vectors. This builds directly on tokenization and enables understanding attention.",
+      "depends_on": [
+        2
+      ],
+      "primary_question": "How do token numbers become meaningful representations that capture word relationships?",
+      "lesson_type": "BALANCED",
+      "estimated_minutes": 50,
+      "xp_reward": 150
+    },
+    {
+      "lesson_number": 4,
+      "title": "Implementing Attention Mechanisms with Interactive Heatmaps",
+      "concept": "Self-attention as learned token relationships",
+      "what_gets_built": "A clickable heatmap shows which tokens the model pays attention to when processing each word in the input.",
+      "codebase_state_before": "Tokenizer and embedding panels working, empty attention panel",
+      "codebase_state_after": "Attention heatmap panel with matrix calculations, interactive hover effects, and attention weight visualization",
+      "why_here": "Attention is the core mechanism of transformers and requires embeddings to be meaningful. This is the most complex concept so it gets dedicated focus.",
+      "depends_on": [
+        3
+      ],
+      "primary_question": "How does the model decide which words to focus on when generating each new word?",
+      "lesson_type": "CONCEPT_HEAVY",
+      "estimated_minutes": 55,
+      "xp_reward": 160
+    },
+    {
+      "lesson_number": 5,
+      "title": "Building a Sampling Distribution Visualizer",
+      "concept": "Probabilistic text generation from logits",
+      "what_gets_built": "A bar chart shows probability distributions for next tokens, updating as users adjust temperature and top-p sliders.",
+      "codebase_state_before": "Tokenizer, embedding, and attention panels working, empty sampling panel",
+      "codebase_state_after": "Interactive sampling panel with probability bars, temperature/top-p controls, and real-time distribution updates",
+      "why_here": "Now that we understand how models process input, we need to see how they generate output. This explains the randomness in LLM responses.",
+      "depends_on": [
+        4
+      ],
+      "primary_question": "Why does the same prompt give different responses, and how can I control that randomness?",
+      "lesson_type": "CODE_HEAVY",
+      "estimated_minutes": 40,
+      "xp_reward": 135
+    },
+    {
+      "lesson_number": 6,
+      "title": "Creating a Hallucination Risk Detection System",
+      "concept": "Confidence scoring through entropy analysis",
+      "what_gets_built": "A risk meter analyzes the probability distributions and flags when the model is likely hallucinating or uncertain.",
+      "codebase_state_before": "All previous panels working, empty hallucination indicator space",
+      "codebase_state_after": "Hallucination risk panel with entropy calculations, confidence scoring, and visual risk indicators",
+      "why_here": "This builds directly on sampling distributions to show practical applications of probability analysis. It addresses a key developer concern about LLM reliability.",
+      "depends_on": [
+        5
+      ],
+      "primary_question": "How can I tell when an LLM is making stuff up versus giving reliable information?",
+      "lesson_type": "BALANCED",
+      "estimated_minutes": 35,
+      "xp_reward": 130
+    },
+    {
+      "lesson_number": 7,
+      "title": "Implementing Multi-Model Comparison Dashboard",
+      "concept": "Model architecture differences through comparative analysis",
+      "what_gets_built": "Users can switch between different models (GPT, Claude, Llama) and see how their internal processing differs for the same input.",
+      "codebase_state_before": "Single-model version of all panels working",
+      "codebase_state_after": "Model selector dropdown, API integrations for multiple models, side-by-side comparison views for all panels",
+      "why_here": "Once learners understand one model deeply, comparing multiple models reinforces the concepts and shows practical differences developers encounter.",
+      "depends_on": [
+        6
+      ],
+      "primary_question": "How do different LLMs actually differ in their internal processing, and when should I use which one?",
+      "lesson_type": "CODE_HEAVY",
+      "estimated_minutes": 50,
+      "xp_reward": 145
+    },
+    {
+      "lesson_number": 8,
+      "title": "Adding Real-Time Performance Monitoring",
+      "concept": "LLM performance metrics and bottleneck identification",
+      "what_gets_built": "Performance graphs show token processing speed, memory usage, and computational costs across different models and inputs.",
+      "codebase_state_before": "Multi-model comparison working without performance tracking",
+      "codebase_state_after": "Performance monitoring panel with charts for latency, throughput, memory usage, and cost estimation",
+      "why_here": "Performance is crucial for production use but requires understanding the full pipeline first. This addresses practical deployment concerns.",
+      "depends_on": [
+        7
+      ],
+      "primary_question": "How do I measure and optimize LLM performance for production applications?",
+      "lesson_type": "BALANCED",
+      "estimated_minutes": 40,
+      "xp_reward": 135
+    },
+    {
+      "lesson_number": 9,
+      "title": "Building Interactive Prompt Engineering Tools",
+      "concept": "Prompt optimization through internal state analysis",
+      "what_gets_built": "Users can experiment with prompt variations and see how changes affect attention patterns, confidence scores, and output quality.",
+      "codebase_state_before": "All monitoring and comparison features working with fixed prompts",
+      "codebase_state_after": "Prompt engineering panel with A/B testing interface, prompt templates, and effectiveness scoring",
+      "why_here": "This synthesizes all previous learning into practical prompt engineering skills. It requires understanding of attention, confidence, and model differences.",
+      "depends_on": [
+        8
+      ],
+      "primary_question": "How can I systematically improve my prompts using what I know about LLM internals?",
+      "lesson_type": "BALANCED",
+      "estimated_minutes": 45,
+      "xp_reward": 140
+    },
+    {
+      "lesson_number": 10,
+      "title": "Deploying and Optimizing the Complete LLM Playground",
+      "concept": "Production deployment and user experience optimization",
+      "what_gets_built": "The app is deployed with proper error handling, loading states, responsive design, and sharing capabilities for demo purposes.",
+      "codebase_state_before": "Fully functional app running locally with all panels complete",
+      "codebase_state_after": "Production-ready deployed app with error handling, optimization, testing suite, and documentation",
+      "why_here": "The final lesson focuses on shipping and polish rather than new concepts. This gives learners a portfolio piece and deployment experience.",
+      "depends_on": [
+        9
+      ],
+      "primary_question": "How do I turn this learning project into a polished demo I can show to others?",
+      "lesson_type": "CODE_HEAVY",
+      "estimated_minutes": 35,
+      "xp_reward": 125
+    }
+  ]
+}
