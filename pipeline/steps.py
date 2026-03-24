@@ -499,6 +499,12 @@ CODEBASE STATE AFTER: {codebase_state_after}
 WHAT GETS BUILT: {what_gets_built}
 RUNS IN BROWSER: {runs_in_browser}
 
+QA FLAGS FROM PREVIOUS RUN (if any):
+{qa_flags}
+
+CODE SHOWN IN LESSON (the learner has seen this — challenge function MUST match this exact signature, parameters, and return type):
+{lesson_code}
+
 The learner has just read the lesson. Now they must implement ONE function or class
 that makes the next piece of the project work.
 
@@ -544,6 +550,7 @@ def run_step_3(
     module_slug: str,
     lesson: dict,
     runs_in_browser: bool = False,
+    qa_flags: str = "",
     force: bool = False,
 ) -> dict[str, Path]:
     log_step("3", f"Challenge Generation — {lesson['title']}")
@@ -564,6 +571,22 @@ def run_step_3(
 
     log(f"Generating challenge for: {lesson['title']}")
 
+    # Extract CODE_READ beats from lesson so challenge matches shown signatures
+    lesson_code = "No lesson code available."
+    lesson_path = l_dir / FILES["lesson"]
+    if lesson_path.exists():
+        import re
+        mdx_content = read(lesson_path)
+        beats_match = re.search(r"export const beats = (\[[\s\S]+\])", mdx_content)
+        if beats_match:
+            try:
+                beats = json.loads(beats_match.group(1))
+                code_blocks = [b["code"] for b in beats if b.get("type") == "CODE_READ" and "code" in b]
+                if code_blocks:
+                    lesson_code = "\n\n".join(code_blocks)
+            except (json.JSONDecodeError, KeyError):
+                pass
+
     prompt = PROMPT_3.format(
         title=lesson["title"],
         concept=lesson["concept"],
@@ -571,11 +594,13 @@ def run_step_3(
         codebase_state_after=lesson["codebase_state_after"],
         what_gets_built=lesson["what_gets_built"],
         runs_in_browser=str(runs_in_browser).lower(),
+        qa_flags=qa_flags or "None.",
+        lesson_code=lesson_code,
     )
 
     system = "You are a senior engineer writing precise, testable code challenges for an AI engineering course. All code must be correct, runnable, and educational."
 
-    data = call_claude_json(prompt, system=system, max_tokens=5000)
+    data = call_claude_json(prompt, system=system, max_tokens=8192)
 
     write(out_paths["challenge"], data["challenge_py"])
     write(out_paths["tests"],     data["test_suite_py"])
@@ -690,7 +715,7 @@ def run_step_4(
         lesson_plan=json.dumps(lesson, indent=2),
         beats=beats_str,
         challenge=challenge[:3000],  # truncate if massive
-        tests=tests[:2000],
+        tests=tests[:4000],
     )
 
     system = "You are a strict curriculum QA engineer. Be thorough. Flag anything that would confuse a learner. Output only valid JSON."

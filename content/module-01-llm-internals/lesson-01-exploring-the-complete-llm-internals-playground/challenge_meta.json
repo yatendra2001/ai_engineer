@@ -1,19 +1,19 @@
 {
-  "title": "Text Tokenization with Position Tracking",
-  "function_name": "tokenize_text_with_positions",
+  "title": "Text Preparation for LLM Pipeline",
+  "function_name": "prepare_input_text",
   "difficulty": "GUIDED",
   "time_estimate_minutes": 12,
   "concepts_tested": [
-    "tokenization",
-    "regex",
-    "position_tracking",
-    "vocabulary_lookup"
+    "text preprocessing",
+    "input validation",
+    "regex patterns",
+    "error handling"
   ],
   "common_mistakes": [
-    "forgetting to handle unknown tokens",
-    "incorrect position calculations",
-    "not normalizing tokens before vocab lookup",
-    "missing empty text edge case"
+    "forgetting to handle empty string case",
+    "not truncating at word boundaries",
+    "incorrect regex patterns",
+    "wrong return dictionary structure"
   ],
   "runs_in_browser": true
 }

@@ -3,43 +3,38 @@
 # Run tests with: pytest test_suite.py -v
 
 import re
-from typing import List, Dict, Any
+from typing import Dict
 
-def tokenize_text_with_positions(text: str, vocab: Dict[str, int]) -> List[Dict[str, Any]]:
+def prepare_input_text(raw_text: str, max_length: int = 2048) -> Dict[str, any]:
     """
-    Tokenize input text using a simple word-based vocabulary and track positions.
+    Validates, cleans, and truncates raw text for the tokenizer panel.
     
-    This function serves as the tokenization step in our LLM pipeline visualization.
-    It breaks text into tokens, maps them to vocabulary IDs, and tracks their
-    positions for highlighting in the UI.
+    This is the entry point to our four-stage LLM processing pipeline:
+    tokenize → embed → attend → sample
     
     Args:
-        text: Input text to tokenize
-        vocab: Dictionary mapping tokens to integer IDs
+        raw_text: The input text to prepare
+        max_length: Maximum character length before truncation
         
     Returns:
-        List of token dictionaries, each containing:
-        - 'token': the actual token string
-        - 'id': vocabulary ID (or vocab['<UNK>'] for unknown tokens)
-        - 'start': character start position in original text
-        - 'end': character end position in original text
+        Dict with 'processed_text' (str) and 'truncated' (bool) keys
         
-    Example:
-        >>> vocab = {'hello': 1, 'world': 2, '<UNK>': 0}
-        >>> tokenize_text_with_positions('hello world', vocab)
-        [{'token': 'hello', 'id': 1, 'start': 0, 'end': 5},
-         {'token': 'world', 'id': 2, 'start': 6, 'end': 11}]
+    Raises:
+        TypeError: If raw_text is not a string
+        ValueError: If raw_text is empty
     """
     # YOUR CODE HERE
-    # Hint: Use regex to find word boundaries and track positions
-    # Handle unknown tokens by mapping to vocab['<UNK>']
+    # Step 1: Validate input type and check for empty text
+    
+    # YOUR CODE HERE  
+    # Step 2: Remove HTML tags using regex pattern r'<[^>]+>'
+    
+    # YOUR CODE HERE
+    # Step 3: Normalize whitespace (multiple spaces/newlines to single space)
+    
+    # YOUR CODE HERE
+    # Step 4: Handle truncation at word boundaries if text exceeds max_length
+    
+    # YOUR CODE HERE
+    # Step 5: Return dictionary with processed_text and truncated flag
     pass
-
-def _normalize_token(token: str) -> str:
-    """Helper: Convert token to lowercase and strip punctuation."""
-    return re.sub(r'[^\w]', '', token.lower())
-
-def _find_token_matches(text: str) -> List[tuple]:
-    """Helper: Find all word tokens with their positions."""
-    return [(match.group(), match.start(), match.end()) 
-            for match in re.finditer(r'\b\w+\b', text)]

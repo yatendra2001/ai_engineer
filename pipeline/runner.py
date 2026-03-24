@@ -18,6 +18,15 @@ Usage:
   # Re-run with QA flags applied
   python -m pipeline fix --module module-01-llm-internals --lesson 3
 
+  # Auto-refine: loop Steps 2-3-4 until QA passes
+  python -m pipeline refine --module module-01-llm-internals --lesson 1
+
+  # Strict refine (only stop on full PASS, not WARN)
+  python -m pipeline refine --module module-01-llm-internals --lesson 1 --require-pass
+
+  # More attempts for stubborn lessons
+  python -m pipeline refine --module module-01-llm-internals --lesson 1 --max-attempts 8
+
   # Force re-run even if output exists
   python -m pipeline run --module module-01-llm-internals --lesson 3 --force
 
@@ -359,6 +368,67 @@ def cmd_fix(args):
     log("Fix applied. Review quality_report.json and do the lesson again.", "success")
 
 
+def cmd_refine(args):
+    """Auto-fix loop: extract QA failures, re-run Steps 2-3-4, repeat until PASS."""
+    m = get_module(args.module)
+    lesson = get_lesson(args.module, args.lesson)
+    runs_in_browser = lesson_runs_in_browser(args.lesson)
+    l_slug = lesson_slug(args.lesson, lesson["title"])
+    report_path = lesson_dir(args.module, l_slug) / FILES["quality_report"]
+
+    print_header(f"Refine: Lesson {args.lesson} — {lesson['title']}")
+
+    prev_failed_ids = None
+
+    for attempt in range(1, args.max_attempts + 1):
+        log(f"Attempt {attempt}/{args.max_attempts}", "step")
+
+        flags = _extract_failures_from_report(args.module, args.lesson)
+
+        if not flags:
+            log("No quality report found — running initial Steps 2 → 3 → 4", "info")
+            run_step_2(args.module, lesson, force=True)
+            run_step_3(args.module, lesson, runs_in_browser=runs_in_browser, force=True)
+            run_step_4(args.module, lesson, force=True)
+        else:
+            log(f"Injecting failures into prompts:\n{flags}", "info")
+            run_step_2(args.module, lesson, qa_flags=flags, force=True)
+            run_step_3(args.module, lesson, runs_in_browser=runs_in_browser, qa_flags=flags, force=True)
+            run_step_4(args.module, lesson, force=True)
+
+        write_meta(args.module, lesson, m["type"], runs_in_browser)
+
+        report = read_json(report_path)
+        overall = report.get("overall", "UNKNOWN")
+
+        if overall == "PASS":
+            log(f"PASS on attempt {attempt}. Lesson is ready.", "success")
+            return
+
+        if overall == "WARN" and not args.require_pass:
+            log(f"WARN on attempt {attempt} — no blocking issues. Stopping (use --require-pass to continue).", "success")
+            return
+
+        # Stall detection: same FAIL check IDs two attempts in a row
+        current_failed_ids = frozenset(
+            c["id"] for c in report.get("checks", []) if c["status"] == "FAIL"
+        )
+        if prev_failed_ids is not None and current_failed_ids == prev_failed_ids:
+            log(
+                f"Same checks failing as last attempt: {', '.join(sorted(current_failed_ids))}. "
+                "This is likely a structural issue — consider editing module_plan.json directly "
+                "and re-running with: --steps 2,3,4 --force",
+                "warn",
+            )
+        prev_failed_ids = current_failed_ids
+
+        blocking = report.get("blocking_issues", [])
+        log(f"Still FAIL — {len(blocking)} blocking issue(s). Looping...", "warn")
+
+    log(f"Reached max attempts ({args.max_attempts}). Still not passing.", "error")
+    log("Review quality_report.json — the remaining issues may be structural.", "info")
+
+
 def cmd_status(args):
     """Show completion status for all lessons in a module."""
     m = get_module(args.module)
@@ -467,6 +537,52 @@ def _load_qa_flags(module_slug: str, lesson_number: int) -> str:
 
 
 # ─────────────────────────────────────────────────────────────────────────────
+# QA report failure extractor (for refine loop)
+# ─────────────────────────────────────────────────────────────────────────────
+
+def _extract_failures_from_report(module_slug: str, lesson_number: int) -> str:
+    """Extract FAIL checks, blocking issues, and auto-fixable suggestions from quality_report.json."""
+    plan_path = module_dir(module_slug) / FILES["module_plan"]
+    if not plan_path.exists():
+        return ""
+    plan = read_json(plan_path)
+    lessons = plan.get("lessons", [])
+    match = next((l for l in lessons if l["lesson_number"] == lesson_number), None)
+    if not match:
+        return ""
+
+    l_slug = lesson_slug(lesson_number, match["title"])
+    report_path = lesson_dir(module_slug, l_slug) / FILES["quality_report"]
+
+    if not report_path.exists():
+        return ""
+
+    report = read_json(report_path)
+
+    parts = []
+
+    failed_checks = [c for c in report.get("checks", []) if c["status"] == "FAIL"]
+    if failed_checks:
+        parts.append("FAILED CHECKS:")
+        for c in failed_checks:
+            parts.append(f"  - [{c['id']}] {c.get('detail', 'no detail')}")
+
+    blocking = report.get("blocking_issues", [])
+    if blocking:
+        parts.append("BLOCKING ISSUES:")
+        for b in blocking:
+            parts.append(f"  - {b}")
+
+    fixable = report.get("auto_fixable", [])
+    if fixable:
+        parts.append("SUGGESTED FIXES:")
+        for f in fixable:
+            parts.append(f"  - {f}")
+
+    return "\n".join(parts)
+
+
+# ─────────────────────────────────────────────────────────────────────────────
 # CLI entry point
 # ─────────────────────────────────────────────────────────────────────────────
 
@@ -501,6 +617,14 @@ def main():
     p_fix.add_argument("--module", required=True)
     p_fix.add_argument("--lesson", required=True, type=int)
 
+    # refine (auto-fix loop)
+    p_refine = subparsers.add_parser("refine", help="Auto-fix loop: re-run 2-3-4 using QA failures until PASS")
+    p_refine.add_argument("--module", required=True)
+    p_refine.add_argument("--lesson", required=True, type=int)
+    p_refine.add_argument("--max-attempts", type=int, default=5)
+    p_refine.add_argument("--require-pass", action="store_true",
+                          help="Only stop on full PASS, keep looping through WARNs")
+
     # status
     p_status = subparsers.add_parser("status", help="Show completion status for a module")
     p_status.add_argument("--module", required=True)
@@ -515,6 +639,7 @@ def main():
         "run":       cmd_run,
         "module":    cmd_module,
         "fix":       cmd_fix,
+        "refine":    cmd_refine,
         "status":    cmd_status,
         "list":      cmd_list,
     }

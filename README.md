@@ -26,11 +26,14 @@ python3 -m pipeline run --module module-01-llm-internals --lesson 1
 # 5. Check quality report
 cat content/module-01-llm-internals/lesson-01-*/quality_report.json
 
-# 6. Do the lesson yourself — fill in qa_log.md with any flags
-# 7. If there are flags, fix them:
+# 6. If FAIL, auto-refine until it passes:
+python3 -m pipeline refine --module module-01-llm-internals --lesson 1
+
+# 7. Do the lesson yourself — fill in qa_log.md with any flags
+# 8. If there are flags, fix them:
 python3 -m pipeline fix --module module-01-llm-internals --lesson 1
 
-# 8. When the lesson passes QA, move to lesson 2
+# 9. When the lesson passes QA, move to lesson 2
 ```
 
 ---
@@ -62,6 +65,15 @@ python3 -m pipeline module --module MODULE_SLUG --lesson-range 3-7
 # Apply QA flags and re-run steps 2+3
 python3 -m pipeline fix --module MODULE_SLUG --lesson N
 
+# Auto-refine: loop steps 2-3-4 using QA failures until PASS
+python3 -m pipeline refine --module MODULE_SLUG --lesson N
+
+# Strict refine (only stop on full PASS, not WARN)
+python3 -m pipeline refine --module MODULE_SLUG --lesson N --require-pass
+
+# More attempts for stubborn lessons
+python3 -m pipeline refine --module MODULE_SLUG --lesson N --max-attempts 8
+
 # Check status of a module
 python3 -m pipeline status --module MODULE_SLUG
 ```
@@ -81,11 +93,17 @@ Step 3   challenge     → challenge.py          (auto)
                           hints.json
                           solution.py
 Step 4   quality check → quality_report.json   (auto)
+Refine   (if FAIL)    → loops steps 2-3-4 with failures injected (auto)
 Step 5   YOUR QA       → qa_log.md             (you do the lesson)
-Fix      (if needed)   → re-runs steps 2+3 with QA flags
+Fix      (if needed)   → re-runs steps 2+3 with your QA flags
 ```
 
 **Step 5 is the only human step. Do it by actually building the project.**
+
+`refine` reads the quality report, extracts every FAIL check and blocking issue,
+injects them into the Step 2 and Step 3 prompts, and re-runs until PASS or WARN.
+If the same checks keep failing across attempts, it warns you that the issue is
+likely structural (wrong lesson plan) rather than a prompt issue.
 
 ---
 
@@ -166,8 +184,9 @@ Per lesson (5 API calls):
 - Step 3: ~2K input, ~4K output
 - Step 4: ~5K input, ~1K output
 
-**~$0.05–0.15 per lesson** at current Sonnet pricing.  
-134 lessons ≈ **$7–20 for the entire curriculum**.
+**~$0.05–0.15 per lesson** at current Sonnet pricing (single pass).  
+Each `refine` iteration adds ~$0.04–0.10 (Steps 2+3+4 only).  
+134 lessons ≈ **$7–20 for the entire curriculum** (before refine loops).
 
 ---
 

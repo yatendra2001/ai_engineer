@@ -1,74 +1,52 @@
 import pytest
-from challenge import tokenize_text_with_positions
+from challenge import prepare_input_text
 
-def test_basic_tokenization():
-    """Test happy path with known vocabulary tokens."""
-    vocab = {
-        'hello': 1,
-        'world': 2, 
-        'the': 3,
-        '<UNK>': 0
-    }
-    text = "Hello world"
+def test_prepare_input_text_happy_path():
+    """Test normal text processing with HTML removal and whitespace normalization."""
+    raw_text = "<p>Hello    world!\n\nThis is a test.</p>"
+    result = prepare_input_text(raw_text, max_length=100)
     
-    result = tokenize_text_with_positions(text, vocab)
-    
-    expected = [
-        {'token': 'Hello', 'id': 1, 'start': 0, 'end': 5},
-        {'token': 'world', 'id': 2, 'start': 6, 'end': 11}
-    ]
-    
+    assert result["processed_text"] == "Hello world! This is a test."
+    assert result["truncated"] == False
+    assert isinstance(result, dict)
     assert len(result) == 2
-    assert result[0]['token'] == 'Hello'
-    assert result[0]['id'] == 1
-    assert result[0]['start'] == 0
-    assert result[0]['end'] == 5
-    assert result[1]['token'] == 'world'
-    assert result[1]['id'] == 2
-    assert result[1]['start'] == 6
-    assert result[1]['end'] == 11
 
-def test_unknown_tokens():
-    """Test edge case with tokens not in vocabulary."""
-    vocab = {
-        'hello': 1,
-        '<UNK>': 0
-    }
-    text = "hello xyz unknown"
+def test_prepare_input_text_truncation_edge_case():
+    """Test truncation at word boundary when text exceeds max_length."""
+    long_text = "The quick brown fox jumps over the lazy dog again and again"
+    result = prepare_input_text(long_text, max_length=30)
     
-    result = tokenize_text_with_positions(text, vocab)
-    
-    assert len(result) == 3
-    assert result[0]['id'] == 1  # 'hello' is known
-    assert result[1]['id'] == 0  # 'xyz' is unknown -> <UNK>
-    assert result[2]['id'] == 0  # 'unknown' is unknown -> <UNK>
-    assert result[1]['token'] == 'xyz'
-    assert result[2]['token'] == 'unknown'
+    # Should truncate at word boundary, not mid-word
+    assert result["processed_text"] == "The quick brown fox jumps over"
+    assert result["truncated"] == True
+    assert len(result["processed_text"]) <= 30
+    assert not result["processed_text"].endswith(" ")
 
-def test_empty_text_failure():
-    """Test failure case with empty input."""
-    vocab = {'hello': 1, '<UNK>': 0}
-    text = ""
-    
-    result = tokenize_text_with_positions(text, vocab)
-    
-    assert result == []
+def test_prepare_input_text_empty_string_failure():
+    """Test that empty string raises ValueError."""
+    with pytest.raises(ValueError, match="Input text cannot be empty"):
+        prepare_input_text("")
 
-def test_punctuation_and_spacing():
-    """Test handling of punctuation and multiple spaces."""
-    vocab = {
-        'hello': 1,
-        'world': 2,
-        '<UNK>': 0
-    }
-    text = "Hello,  world!"
+def test_prepare_input_text_wrong_type_failure():
+    """Test that non-string input raises TypeError."""
+    with pytest.raises(TypeError, match="Expected string, got"):
+        prepare_input_text(123)
+
+def test_prepare_input_text_html_removal():
+    """Test comprehensive HTML tag removal."""
+    html_text = "<div><span>Hello</span> <b>world</b>!</div>"
+    result = prepare_input_text(html_text)
     
-    result = tokenize_text_with_positions(text, vocab)
+    assert result["processed_text"] == "Hello world!"
+    assert "<" not in result["processed_text"]
+    assert ">" not in result["processed_text"]
+
+def test_prepare_input_text_whitespace_normalization():
+    """Test that various whitespace patterns are normalized to single spaces."""
+    messy_text = "Hello\t\t\tworld\n\n\n   test"
+    result = prepare_input_text(messy_text)
     
-    assert len(result) == 2
-    assert result[0]['token'] == 'Hello'
-    assert result[0]['start'] == 0
-    assert result[0]['end'] == 5
-    assert result[1]['token'] == 'world'
-    assert result[1]['start'] == 8
-    assert result[1]['end'] == 13
+    assert result["processed_text"] == "Hello world test"
+    assert "\n" not in result["processed_text"]
+    assert "\t" not in result["processed_text"]
+    assert "  " not in result["processed_text"]

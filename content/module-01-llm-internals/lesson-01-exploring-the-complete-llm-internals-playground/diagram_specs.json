@@ -3,8 +3,8 @@
   "diagrams": [
     {
       "type": "DIAGRAM",
-      "caption": "Four-Panel LLM Internals Visualization Architecture",
-      "description": "Top row shows two panels: left 'Tokenization' box contains 'Hello world' → ['Hello', ' world'] → [15496, 995]. Right 'Attention Weights' box shows 4x4 heatmap grid labeled 'Layer 1 Head 1' with darker squares indicating stronger connections. Bottom row: left 'Hidden States' box shows 3 stacked layers with dots representing vector dimensions. Right 'Output Probabilities' box shows horizontal bar chart with 'the' (0.15), 'world' (0.12), 'is' (0.08). Arrows connect panels clockwise showing data flow."
+      "caption": "LLM Processing Pipeline",
+      "description": "Horizontal pipeline with four rectangular boxes connected by arrows. Box 1: 'Raw Text' contains 'Hello world!'. Arrow labeled 'TOKENIZE'. Box 2: 'Tokens' contains '[15496, 1917, 0]'. Arrow labeled 'EMBED'. Box 3: 'Vectors' contains grid of numbers. Arrow labeled 'ATTEND'. Box 4: 'Attention Output' contains modified grid. Arrow labeled 'SAMPLE'. Final box: 'Generated Text' contains 'Hello world! How'. Black on white, monospace font."
     }
   ]
 }

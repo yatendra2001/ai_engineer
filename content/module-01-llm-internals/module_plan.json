@@ -8,10 +8,10 @@
     {
       "lesson_number": 1,
       "title": "Exploring the Complete LLM Internals Playground",
-      "concept": "End-to-end LLM processing pipeline visualization",
-      "what_gets_built": "A complete demo of the finished app runs locally, showing all panels working together with sample text.",
+      "concept": "The four-stage LLM processing pipeline (tokenize → embed → attend → sample)",
+      "what_gets_built": "See the full LLM Internals Playground vision, understand the four-stage pipeline, and implement a text preparation function that validates and cleans input for the tokenizer.",
       "codebase_state_before": "Empty repository",
-      "codebase_state_after": "Complete working demo app with all panels functional but code intentionally obfuscated/minified",
+      "codebase_state_after": "Project scaffold with one utility function (prepare_input_text) that validates, cleans, and truncates raw text for the tokenizer panel",
       "why_here": "Developers need to see the complete vision before committing time. This creates motivation and provides a concrete reference for what each subsequent lesson builds toward.",
       "depends_on": [],
       "primary_question": "What exactly am I going to build and why should I care?",
